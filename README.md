@@ -44,7 +44,7 @@ depuis ton PC ou ton téléphone (PWA installable, utilisable hors-ligne).
 | Poste | Coût |
 |---|---|
 | GitHub (dépôt privé + Actions) | 0 € |
-| Hébergement de l'app (Cloudflare Pages) | 0 € |
+| Hébergement de l'app (GitHub Pages, inclus dans GitHub Pro) | 0 € de plus |
 | CSV / OFX bancaires | 0 € (sans IA, à part une catégorisation groupée de quelques centimes) |
 | IA, modèle par défaut `claude-opus-5-5` | ordre de grandeur : ~0,04 $ par ticket photo, ~0,15 $ par relevé PDF de 4 pages, soit **~1,50 $/mois** pour 2 relevés + 30 tickets |
 | IA, option `claude-haiku-5-5` | environ 40 fois moins cher (quelques centimes par mois), un peu moins précis sur les documents difficiles |
@@ -55,17 +55,16 @@ documents avant de changer de modèle.
 
 ## Mise en place (≈ 15 min, une seule fois)
 
-1. **Fusionner** cette branche dans `main` (les tâches planifiées ne tournent que sur la branche par défaut).
-2. **Clé API** : crée une clé sur <https://console.anthropic.com>, puis dans le dépôt
+1. **Activer GitHub Pages** (inclus dans GitHub Pro) : dans le dépôt, *Settings → Pages → Build and deployment → Source* : **GitHub Actions**.
+2. **Fusionner** cette branche dans `main` : la passe quotidienne démarre et l'app est publiée sur
+   **https://engob.github.io/compta/** (workflow « Publication de l'app », republiée à chaque modification du code).
+   L'URL de Pages est publique, mais l'app publiée ne contient **aucune donnée** : elle les lit dans ton dépôt privé avec ton jeton.
+3. **Clé API** : crée une clé sur <https://console.anthropic.com> (*Billing* : crédits prépayés et plafond mensuel), puis dans le dépôt
    *Settings → Secrets and variables → Actions → New repository secret* : `ANTHROPIC_API_KEY`.
    Facultatif, onglet *Variables* : `COMPTA_MODEL` (`claude-opus-5-5` par défaut, ou `claude-haiku-5-5`), `COMPTA_EFFORT` (`medium` par défaut).
-3. **Héberger l'app** sur [Cloudflare Pages](https://pages.cloudflare.com) (gratuit, compatible dépôt privé) :
-   *Create → Pages → Connect to Git → engoB/compta*, commande de build `npm run build`, dossier `dist`.
-   Dans *Settings → Builds → Build watch paths*, exclure `data/*`, `archive/*`, `inbox/*` pour ne pas reconstruire à chaque passe.
-   L'app publiée ne contient **aucune donnée** : elle les lit dans ton dépôt privé avec ton jeton.
-   (Vercel ou Netlify marchent pareil. GitHub Pages exige un compte payant pour un dépôt privé.)
 4. **Jeton d'accès** : <https://github.com/settings/personal-access-tokens/new> → *Only select repositories : compta* →
-   permissions **Contents : Read and write** et **Actions : Read and write**. Colle-le dans l'app, onglet *Réglages*.
+   permissions **Contents : Read and write** et **Actions : Read and write**. Colle-le dans l'app, onglet *Réglages*
+   (une fois par appareil : il reste stocké localement).
 5. **Installer l'app** : ouvre l'URL sur ton téléphone → *Partager → Sur l'écran d'accueil* (iPhone) ou *Installer l'application* (Android/Chrome).
 
 Sans jeton, l'app s'ouvre en **mode démo** avec des données fictives.
@@ -105,7 +104,7 @@ data/
   last-run.json       résumé de la dernière passe
 inbox/                boîte de dépôt
 archive/AAAA/MM/      justificatifs traités (nommés par empreinte SHA-256 → pas de double traitement)
-.github/workflows/    process.yml (passe quotidienne + à chaque dépôt), ci.yml (tests + build)
+.github/workflows/    process.yml (passe quotidienne + à chaque dépôt), deploy.yml (publication GitHub Pages), ci.yml (tests + build)
 ```
 
 ## Développement
