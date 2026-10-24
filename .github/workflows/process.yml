@@ -1,0 +1,46 @@
+name: Passe comptable
+
+on:
+  schedule:
+    - cron: "17 5 * * *" # tous les jours vers 7 h (heure de Paris)
+  push:
+    branches: [main]
+    paths: ["inbox/**", "data/rules.json"]
+  workflow_dispatch:
+
+# Une seule passe à la fois ; les dépôts rapprochés sont regroupés.
+concurrency:
+  group: compta-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Analyse des justificatifs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COMPTA_MODEL: ${{ vars.COMPTA_MODEL }}
+          COMPTA_EFFORT: ${{ vars.COMPTA_EFFORT }}
+          GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.GDRIVE_SERVICE_ACCOUNT_JSON }}
+          GDRIVE_INBOX_FOLDER_ID: ${{ vars.GDRIVE_INBOX_FOLDER_ID }}
+          GDRIVE_DONE_FOLDER_ID: ${{ vars.GDRIVE_DONE_FOLDER_ID }}
+        run: npm run pipeline
+      - name: Enregistrement du tableau
+        run: |
+          git config user.name "compta-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data archive inbox
+          if git diff --cached --quiet; then echo "Rien de nouveau"; exit 0; fi
+          git commit -m "Passe comptable $(date -u +%Y-%m-%d)" -m "$(jq -r '"\(.processed) traité(s), \(.toReview) à vérifier, \(.newTx) opération(s), \(.costUsd) $"' data/last-run.json)"
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep $((i*3)); done

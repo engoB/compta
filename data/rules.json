@@ -1,0 +1,19 @@
+{
+  "categories": [
+    "Revenus", "Alimentation", "Restaurants", "Transport", "Carburant", "Logement", "Énergie",
+    "Télécom & Internet", "Santé", "Assurances", "Abonnements", "Shopping", "Loisirs", "Voyages",
+    "Impôts & taxes", "Frais bancaires", "Épargne & placements", "Virements internes", "Professionnel", "Autre"
+  ],
+  "rules": [
+    { "pattern": "sncf|ouigo|ratp|navigo|uber|bolt|blablacar", "category": "Transport" },
+    { "pattern": "total ?energies|esso|shell|bp |avia|intermarche carbu|station", "category": "Carburant" },
+    { "pattern": "carrefour|leclerc|auchan|lidl|aldi|intermarche|monoprix|franprix|casino|picard|biocoop|super ?u|hyper ?u", "category": "Alimentation" },
+    { "pattern": "netflix|spotify|deezer|disney|canal\\+|amazon prime|youtube premium|apple\\.com/bill|icloud", "category": "Abonnements" },
+    { "pattern": "free mobile|free telecom|orange|sfr|bouygues|sosh|red by", "category": "Télécom & Internet" },
+    { "pattern": "edf|engie|totalenergies electricite|ekwateur|veolia|suez|eau de", "category": "Énergie" },
+    { "pattern": "pharmacie|doctolib|cpam|mutuelle|ameli|dentiste|medecin|opticien", "category": "Santé" },
+    { "pattern": "dgfip|impots|impot|tresor public|urssaf|taxe", "category": "Impôts & taxes" },
+    { "pattern": "cotisation carte|frais tenue|commission|agios|frais bancaires|cotis\\.", "category": "Frais bancaires" },
+    { "pattern": "salaire|paie|traitement|pole emploi|france travail|caf |allocation", "category": "Revenus" }
+  ]
+}
